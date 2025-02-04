@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SaySlang</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: url('https://cdn.discordapp.com/attachments/738365359773712444/1335544519944572990/cover.jpg?ex=67a28882&is=67a13702&hm=7c428938d653541c52edc64b35eda0d5b176692ff00aacfdcd0bdb29b191723a&') no-repeat center center fixed;
+            background-size: cover;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background-color: #ff5722;
+            color: white;
+            padding: 35px;
+            text-align: center;
+            font-size: 55px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            letter-spacing: 2px;
+            border-bottom: 5px solid #e06a3b;
+            background: linear-gradient(135deg, #e06a3b, #ff5722); /* ไล่สีส้ม */;
+
+        }
+
+        .search-box {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            position: relative;
+        }
+
+        .search-box input {
+            padding: 20px;
+            font-size: 22px;
+            width: 85%;
+            max-width: 650px;
+            border: 3px solid #ff5722;
+            border-radius: 15px;
+            background-color: #fff;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #ff5722;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .search-results {
+            position: absolute;
+            top: 70px;
+            width: 85%;
+            max-width: 650px;
+            background-color: white;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            display: none;
+            z-index: 10;
+            padding: 15px;
+            box-sizing: border-box;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .search-results div {
+            padding: 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #ddd;
+            font-size: 18px;
+        }
+
+        .search-results div:hover {
+            background-color: #f0f0f0;
+            border-radius: 10px;
+        }
+
+        .random-word-box {
+            background-color: #fff;
+            border-radius: 15px;
+            margin: 20px auto;
+            padding: 20px;
+            text-align: center;
+            font-size: 30px;
+            width: 80%;
+            max-width: 500px;
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            animation: fadeOutIn 2s forwards;
+        }
+
+        /* แอนิเมชันสำหรับคำที่หายไปและคำใหม่ที่โผล่ */
+        @keyframes fadeOutIn {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0; transform: scale(0.5); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+            padding: 10px;
+            background-color: #ff5722;
+            color: white;
+        }
+
+        .button {
+            background-color: #ff5722;
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            transition: all 0.3s;
+            border: none;
+            width: 100%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .button:hover {
+            background-color: #e06a3b;
+            transform: scale(1.05);
+        }
+
+        .word-list-container {
+            position: fixed;
+            bottom: -100%;
+            width: 100%;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            border-radius: 10px 10px 0 0;
+            z-index: 10;
+            display: none;
+            transition: bottom 0.5s ease-out;
+        }
+
+        .word-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            overflow-y: scroll;
+            height: 300px;
+        }
+
+        .word-card {
+            background-color: white;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            width: 30%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .word-card:hover {
+            transform: scale(1.05);
+        }
+
+        .back-home-button {
+            background-color: #ff5722;
+            color: white;
+            padding: 20px 40px;
+            font-size: 22px;
+            font-weight: bold;
+            border-radius: 15px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .back-home-button:hover {
+            background-color: #e06a3b;
+            transform: scale(1.05);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        SaySlang
+    </div>
+
+    <div class="random-word-box" id="randomWordBox">
+        <span class="random-word" id="randomWord">โบ้ แปลว่า หมา</span>
+    </div>
+
+    <div class="search-box">
+        <input type="text" id="search" placeholder="ค้นหาคำศัพท์..." oninput="searchWord()">
+        <div class="search-results" id="searchResults"></div>
+    </div>
+
+    <div class="footer">
+        <button class="button" id="showAllWordsBtn">ดูคำศัพท์ทั้งหมด</button>
+    </div>
+
+    <div class="word-list-container" id="wordListContainer">
+        <div class="word-list" id="wordList"></div>
+        <div class="footer">
+            <button class="back-home-button" onclick="closeWordList()">กลับไปหน้าหลัก</button>
+        </div>
+    </div>
+
+    <script>
+        const words = [
+      { word: "บรรทุก", definition: "กินเกินอัตรา" },
+{ word: "บวก", definition: "ชก" },
+{ word: "บอมบ์", definition: "กองอุจจาระ" },
+{ word: "บ๋อย", definition: "บริกรชาย" },
+{ word: "บึ้ม", definition: "ระเบิด" },
+{ word: "บูด", definition: "แย่" },
+{ word: "บูม", definition: "เป็นที่รู้จัก,โจษขานไปทั่ว" },
+{ word: "เบ๊", definition: "ผู้รับใช้,ผู้ยอมรับใช้" },
+{ word: "เบรกแตก", definition: "ทำเรื่อยไปไม่หยุด" },
+{ word: "เบอร์", definition: "ขนาด" },
+{ word: "เบ๊อะ", definition: "เปิ่น" },
+{ word: "เบ้าหน้า", definition: "ลักษณะโครงหน้า" },
+{ word: "เบียด", definition: "แต่งงาน,มีคู่ครอง" },
+{ word: "เบียว", definition: "หลงใหล,หมกมุ่นในพฤติกรรมบางอย่างที่ตนแสร้งทำ" },
+{ word: "ดอทคอม", definition: "เสร่อ, เซ่อซ่า, งง" },
+{ word: "ใจบาง", definition: "แพ้ทาง" },
+            { word: "เจา", definition: "จะเอา" },
+            { word: "เฟื่อน", definition: "สถานะไม่ชัดเจนระหว่างเพื่อนกับแฟน" },
+            { word: "มงลง", definition: "แชมป์ , ชนะเลิฬ" },
+            { word: "โอซาแวง", definition: "หวาดระแวง" },
+            { word: "ยม", definition: "น่าเบื่อ" },
+            { word: "น่ามคาน", definition: "น่ารําคาญ" },
+            { word: "เฟียสกี", definition: "มั่นอกมั่นใจ" },
+            { word: "จัดระบบ", definition: "สั่งสอน" },
+            { word: "ลี่", definition: "อาจจุระ" },
+            { word: "ฟ้ารักพ่อ", definition: "ใช้บอกชอบคนที่มีอายุมากกว่า" },
+            { word: "เม็ดเยอะ", definition: "เรื่องมาก" },
+            { word: "แบน", definition: "ระงับ,ห้าม,คว่ำบาตร" },
+            { word: "โบ", definition: "ดูโบราณ,ไม่ทันสมัย" },
+            { word: "โบ้", definition: "หมา" },
+            { word: "ใบไม้ร่าเริง", definition: "กัญชา" },
+            { word: "ใบหญ้าร่าเริง", definition: "กัญชา" },
+            { word: "อย่าหาทํา", definition: "หยุดทํา,อย่าคิดจะทํา" },
+            { word: "น่ามคาน", definition: "รําคาญ" },
+            { word: "ปล่อยจอย", definition: "ปล่อยวาง,ไม่สนใจ" },
+            { word: "สุดตีน", definition: "ที่สุดของที่สุด" },
+            { word: "หมาต๋า", definition: "ตํารวจ" },
+            { word: "อสกข", definition: "(ย่อมาจากไอ้สัสกูขํา) ความหมาย:หัวเราะ/เยาะเย้ย" },
+            { word: "อารามบอย", definition: "เด็กวัด" },
+            { word: "เอิ๊กๆ", definition: "หัวเราะเชิงเสียดสี" },
+            { word: "เฮีย", definition: "เหี้ย" },
+            { word: "แกง", definition: "แกล้ง" },
+            { word: "จบิง", definition: "จริง" },
+            { word: "ใจฟู", definition: "ดีใจ,มีความสุข" },
+            { word: "น้ำลำไย", definition: "เบียร์" },
+            { word: "บะหมี่", definition: "กะหรี่, โสเภณี" },
+            { word: "บัญชีหนังหมา", definition: "ประวัติอาชญากรรม,บัญชีดํา " },
+            { word: "ประชาชี", definition: "ประชาชนทั่วไป" },
+            { word: "ปีเตอร์", definition: "แมลงสาบ" },
+            { word: "นอยด์อะ", definition: "รู้สึกไม่ดี, น้อยใจ,    รู้สึกแย่" },
+            { word: "อย่ามาเรา", definition: "เราไม่มีอะไรเกี่ยวข้องกัน" },
+            { word: "เหียก", definition: "น่าเกลียด,ขี้เหร่" },
+            { word: "ให้ว่อง", definition: "เร็วๆ" },
+            { word: "แอ๊บ", definition: "แกล้งทํา" },
+            { word: "เอ้าท์", definition: "ตกกระแส" },
+            { word: "แอบหงิม", definition: "แกล้งทําตัวเรียบร้อย" },
+            { word: "โอโม่", definition: "ใช้เรียกผู้หญิงที่ขาวมากๆ" },
+            { word: "ไฮเปอร์โบลา", definition: "ชอบทําตัวไม่เหมือนคนอื่น" },
+            { word: "โฮก", definition: "ตกใจ, ตะลึงมาก" },
+            { word: "สิ่งอัน", definition: "ทุกสิ่งทุกอย่าง" },
+            { word: "สะแอ๋ง", definition: "ชอบสอดเรื่องชาวบ้าน" },
+            { word: "ล้านแปด", definition: "ผู้คนเยอะไปหมด" },
+            { word: "รั่ว", definition: "ท่าทางออกแนวบ้าๆ" },
+            { word: "มิได้นําพา", definition: "ไม่ได้คล้อยตาม" },
+            { word: "เพียวเค็ม", definition: "คนที่งกมากๆ" },
+            { word: "มือฝรั่ง", definition: "เท้า, ตีน" },
+            { word: "วิก", definition: "สถานีโทรทัศน์, โรงมหรสรรพ" },
+            { word: "ติดแกลม", definition: "ใช้ชีวิตที่ติดหรู ติดรวย ติดความสะดวกสบาย" },
+            { word: "อย่าเล่นกับระบบ", definition: "จริงจัง,อย่าท้าทาย" },
+            { word: "อ่อม", definition: "ไม่เลิศ,รู้สึกกร่อย" },
+            { word: "บูด", definition: "ไม่ถูกใจ, ไม่ดี" },
+            { word: "เจ๊อย่าวีน", definition: "อย่าโมโห" },
+            { word: "น้ำรัก", definition: "น้ำกาม" },
+            { word: "นิสัย", definition: "นิสัยไม่ดี" },
+            { word: "นุด", definition: "คน" },
+            { word: "นู้ด", definition: "สีที่ใกล้เคียงกับผิวหนังของคน" },
+            { word: "เนื้อ", definition: "กัญชา" },
+            { word: "ประเคน", definition: "ตี" },
+{ word: "ประชาชี", definition: "ประชาชน" },
+{ word: "ปลดทุกข์", definition: "เยี่ยวหรือขี้" },
+{ word: "ปล่อย", definition: "ขาย" },
+{ word: "ปล่อยโฮ", definition: "ร้องไห้ออกมาอย่างเต็มที่" },
+{ word: "ปลิ้น", definition: "ลักลอบหรือหลอกลวงเอาไปซึ่งหน้า" },
+{ word: "ปลิว", definition: "หลุดหรือหายไปจากเดิมที่เคยมีอยู่" },
+{ word: "ป่อง", definition: "มีครรภ์" },
+{ word: "ป๋องแป๋ง", definition: "อัณฑะ, กระโปก" },
+{ word: "ปอด", definition: "ปอดแหก" },
+{ word: "ปอดแหก", definition: "ขลาด" },
+{ word: "ปัง", definition: "เป๊ะและอลังการมากๆ" },
+{ word: "ปั่น", definition: "ทำให้เพิ่มขึ้นหรือเปลี่ยนแปลงอย่างผิดปกติ" },
+{ word: "ปั๋ว", definition: "ผัว" },
+{ word: "ป้า", definition: "ชายรักเพศเดียวกันที่อายุมาก" },
+{ word: "ปากปลาร้า", definition: "ชอบพูดหรือด่าด้วยคำหยาบ" },
+{ word: "ปากหมา", definition: "ชอบพูดจาว่าร้ายคนอื่น" },
+{ word: "ปาด", definition: "เปลี่ยนช่องทางเดินรถโดยกะทันหัน" },
+{ word: "ปาดหน้า", definition: "แซงตัดหน้า" },
+{ word: "ป้ายยา", definition: "ชักชวน, ชักจูง" },
+{ word: "ปีเตอร์", definition: "แมลงสาบ" },
+{ word: "ปุ๊น", definition: "สูบ (กัญชา)" },
+{ word: "เปย์", definition: "ใช้จ่ายเงินจำนวนมากเพื่อบุคคลที่ตนชอบ" },
+{ word: "เปรี้ยว", definition: "มีลักษณะปราดเปรียว ทันสมัย อิสระ มั่นใจ ชอบการคบหาสมาคม" },
+{ word: "เปา", definition: "ท่าน" },
+{ word: "เป่า", definition: "ฆ่าคนด้วยการยิง" },
+{ word: "เปิด", definition: "เริ่มทะเลาะวิวาทหรือลงมือต่อยตี" },
+{ word: "เปิ๊ดสะก๊าด", definition: "หรูหรา, ทันสมัย" },
+{ word: "แป้ง", definition: "ยาเสพติดที่เป็นผงขาวอย่างเช่นโคเคนหรือเฮโรอีน" },
+{ word: "โปเก", definition: "เก่าแก่จนใช้การไม่ได้ดี" },
+{ word: "โป๊ะแตก", definition: "ความลับถูกเปิดเผยโดยตั้งใจหรือไม่ตั้งใจ" },
+{ word: "ไปที่ชอบๆ", definition: "ใช้บอกกล่าวให้ไปที่อื่นหรือไปให้พ้น" },
+           
+        ];
+
+        // ฟังก์ชันสุ่มคำศัพท์
+        function randomWord() {
+            const randomIndex = Math.floor(Math.random() * words.length);
+            const randomWordElement = document.getElementById("randomWord");
+            const randomWordBox = document.getElementById("randomWordBox");
+
+            // เริ่มแอนิเมชันหายไป
+            randomWordBox.style.animation = 'none'; // รีเซ็ตแอนิเมชัน
+            void randomWordBox.offsetWidth; // trigger reflow เพื่อรีเซ็ตแอนิเมชัน
+            randomWordBox.style.animation = 'fadeOutIn 2s forwards'; // เริ่มแอนิเมชันหายไป
+
+            // เมื่อแอนิเมชันหายไปแล้วให้เปลี่ยนคำ
+            setTimeout(() => {
+                randomWordElement.textContent = `${words[randomIndex].word} แปลว่า ${words[randomIndex].definition}`;
+            }, 1000); // เปลี่ยนคำหลังจากแอนิเมชันหายไป
+
+        }
+
+        // เรียกใช้งานสุ่มคำเมื่อโหลดหน้าเว็บ
+        window.onload = () => {
+            setInterval(randomWord, 4500);  // ทุกๆ 4.5 วินาทีให้สุ่มคำใหม่
+        }
+
+        // ฟังก์ชันค้นหาคำศัพท์
+        function searchWord() {
+            const searchValue = document.getElementById("search").value.toLowerCase();
+            const searchResultsElement = document.getElementById("searchResults");
+            searchResultsElement.innerHTML = ''; // ล้างผลการค้นหาก่อน
+
+            if (searchValue) {
+                const results = words.filter(word =>
+                    word.word.toLowerCase().includes(searchValue)
+                );
+
+                if (results.length > 0) {
+                    results.forEach(word => {
+                        const resultItem = document.createElement("div");
+                        resultItem.textContent = `${word.word} แปลว่า ${word.definition}`;
+                        searchResultsElement.appendChild(resultItem);
+                    });
+                } else {
+                    // แสดงข้อความ "ไม่พบคำศัพท์ที่ค้นหา"
+                    const noResultElement = document.createElement("div");
+                    noResultElement.textContent = "ไม่พบคำศัพท์ที่ค้นหา";
+                    searchResultsElement.appendChild(noResultElement);
+                }
+            }
+            searchResultsElement.style.display = searchValue ? 'block' : 'none';
+        }
+
+        // ฟังก์ชันเปิดคำศัพท์ทั้งหมด
+        function showAllWords() {
+            const wordListContainer = document.getElementById("wordListContainer");
+            const wordListElement = document.getElementById("wordList");
+            wordListElement.innerHTML = ''; // ล้างคำศัพท์เดิม
+
+            words.forEach(word => {
+                const wordCard = document.createElement("div");
+                wordCard.className = "word-card";
+                wordCard.innerHTML = `<strong>${word.word}</strong> แปลว่า ${word.definition}`;
+                wordListElement.appendChild(wordCard);
+            });
+
+            wordListContainer.style.display = 'block';
+            setTimeout(() => {
+                wordListContainer.style.bottom = '0'; // แอนิเมชันเลื่อนขึ้น
+            }, 0);
+        }
+
+        // ฟังก์ชันปิดคำศัพท์ทั้งหมด
+        function closeWordList() {
+            const wordListContainer = document.getElementById("wordListContainer");
+            wordListContainer.style.bottom = '-100%'; // แอนิเมชันเลื่อนลงไป
+            setTimeout(() => {
+                wordListContainer.style.display = 'none'; // ซ่อนคำศัพท์ทั้งหมดหลังจากแอนิเมชัน
+            }, 500);
+        }
+
+        // ฟังก์ชันเปิดคำศัพท์ทั้งหมดเมื่อคลิกปุ่ม
+        document.getElementById("showAllWordsBtn").onclick = showAllWords;
+    </script>
+</body>
+  </html>
